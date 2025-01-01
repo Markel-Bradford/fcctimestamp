@@ -25,15 +25,18 @@ app.get("/api/hello", function (req, res) {
 });
 
 app.get("/api/:date", function (req, res) {
-  var date = req.params.date
-  
+  var date_string = req.params.date
   
   try {
-    const utc = new Date(date);
-    const unix = Date.now();
+    
+    const date = new Date(date_string);
+    const utc = date.toUTCString();
+    const unix = date.getTime() / 1000;
     res.json({ unix: unix, utc: utc });
+    
   } catch (error) {
     res.status(500).json({ error: "Invalid date" });
+    return { error: "Invalid date" }
   }
 });
 
