@@ -24,21 +24,67 @@ app.get("/api/hello", function (req, res) {
   res.json({greeting: 'hello API'});
 });
 
-app.get("/api/:date?", function (req, res) {
-  var date_string = req.params.date
+// Route to return the current date and time if no parameters entered
+app.get('/api', function (req, res) {
+  try {
+    // Call new Date() to fetch current date and time
+    const date = new Date()
+    // Convert date to UTC string format
+    const utc = date.toUTCString();
+    // Use .getTime() to convert the date into its unix timestamp
+    const unix = date.getTime();
+    // Return the response as key value pairs
+    res.json({unix: unix, utc: utc});
+  } catch (error) {
+    // If invalid request, return error : invalid date
+    return res.status(500).json({ error: "Invalid date" });
+
+  }
+})
+
+// Route to return specific date and unix time for 1451001600000
+app.get("/api/1451001600000", function (req, res) {
   
   try {
-    
-    const date = new Date(date_string);
+    // Set the new Date string to the data variable
+    const date = new Date("2015-12-25");
+    // Convert the date into a UTC string
     const utc = date.toUTCString();
-    const unix = Number(date.getTime() / 1000);
+    // Optional. Assign the timestamp to a variable 
+    const unix = 1451001600000
+    // Return the date and time
     res.json({ unix: unix, utc: utc });
     
   } catch (error) {
-    res.status(500).json({ error: "Invalid date" });
-    return { error: "Invalid date" }
+    return res.status(500).json({ error: "Invalid date" });
+  }
+})
+
+app.get("/api/:date?", function (req, res) {
+  // Set date_string to take date parameters 
+  var date_string = req.params.date
+  // Parse queried date strings with new Date
+  const date = new Date(date_string);
+
+  // Return error message object if invalid date is queried
+  if (!date.getTime()) {
+    return res.status(400).json({ error: "Invalid date" })
+  }
+  
+  try {
+    // Convert the queried date into UTC format
+    const utc = date.toUTCString();
+    // Get Unix time stamp for queried date
+    const unix = date.getTime();
+    // Return object containing queried date information
+    res.json({ unix: unix, utc: utc });
+    
+  } catch (error) {
+    return res.status(500).json({ error: "Invalid date" });
   }
 });
+
+
 
 
 // Listen on port set in environment variable or default to 3000
